@@ -94,6 +94,12 @@ async function writeFork($: EngineInterface, point: CutPoint): Promise<string> {
   return fork.sessionId
 }
 
+// Moving the ring is a convenience: where the surface refuses it, the press
+// that asked still goes on.
+async function moveFocus($: EngineInterface, key: string): Promise<void> {
+  await $.ui.focus({ requestId: PANE, key }).catch(() => undefined)
+}
+
 // `/resume <id>` as if typed; it is queued and runs once the session is idle.
 async function switchTo($: EngineInterface, sessionId: string): Promise<void> {
   try {
@@ -197,7 +203,13 @@ export const register: Register = on => {
                 key={`slot:${slot}`}
                 plain
                 autoFocus={slot === slice.length - 1 ? true : undefined}
-                onPress={() => void update($, chosen, () => String(first + slot))}
+                onPress={async () => {
+                  await update($, chosen, () => String(first + slot))
+                  // autoFocus only acts when the pane takes the keyboard, and the
+                  // ring is already in it: put it on the confirm button, so a
+                  // second Enter forks.
+                  await moveFocus($, 'go')
+                }}
               >
                 <Text color={color} bold>
                   {lead}
@@ -237,7 +249,16 @@ export const register: Register = on => {
               }
             }}
           />
-          <Button key="back" hotkey="n" label="Pick again" onPress={() => void update($, chosen, () => '')} />
+          <Button
+            key="back"
+            hotkey="n"
+            label="Pick again"
+            onPress={async () => {
+              await update($, chosen, () => '')
+              const first = windowStart(list.length, await read($, page))
+              await moveFocus($, `slot:${index - first}`)
+            }}
+          />
         </Box>
         {note !== '' && <Text dimColor>{note}</Text>}
       </Box>

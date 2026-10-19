@@ -37,7 +37,6 @@ test('picking a point forks at its uuid and resumes the fork', async ($, on) => 
   })
   on('ui.open', () => ({ value: { isPlaced: true } }))
   on('ui.close', () => ({ value: undefined }))
-
   for (const surface of ['terminal', 'desktop'] as const) {
     forkedAt = []
     resumed = []
@@ -48,6 +47,10 @@ test('picking a point forks at its uuid and resumes the fork', async ($, on) => 
     const ui = await $.ui.mount({ plugin: 'fork-at', surface, component: 'Pane', requestId: 'fork-at', props: PANE_PROPS })
     await ui.press({ key: 'slot:2' })
     expect(await ui.find({ type: 'Text', text: /#3 .*Bash: ls/ })).toBeDefined()
+
+    // Pick again returns to the list; the same row picks again.
+    await ui.press({ key: 'back' })
+    await ui.press({ key: 'slot:2' })
 
     await ui.press({ key: 'go' })
     expect(forkedAt).toEqual(['u-tool-1'])
