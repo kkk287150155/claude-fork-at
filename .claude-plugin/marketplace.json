@@ -1,0 +1,6 @@
+{
+  "name": "claude-fork-at",
+  "owner": { "name": "kkk287150155" },
+  "description": "fork-at: fork a Claude Code conversation at any reply or tool call",
+  "plugins": [{ "name": "fork-at", "source": "./" }]
+}

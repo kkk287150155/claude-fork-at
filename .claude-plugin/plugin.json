@@ -1,0 +1,7 @@
+{
+  "name": "fork-at",
+  "version": "0.1.0",
+  "description": "/fork-at: fork the conversation at any reply or tool call, not just at your prompts, and switch to the fork",
+  "author": { "name": "kkk287150155" },
+  "types": "./types/index.d.ts"
+}
